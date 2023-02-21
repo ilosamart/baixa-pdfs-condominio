@@ -72,7 +72,7 @@ with requests.Session() as s:
         link = periodo['href'].split('"')[1]
         mes, ano = periodo.text.split('/')
         mes = meses[mes]
-        file_dst = f'/tmp/{ano}_{mes}.xlsx'
+        file_dst = f'{settings.dest_path}/{ano}_{mes}.xlsx'
         # print(f"{periodo['id']}: {periodo.text} - {link}")
 
         data = get_aspx_data(bso)
@@ -84,7 +84,7 @@ with requests.Session() as s:
         r = s.post('https://portal.auxiliadorapredial.com.br/Extrato.aspx', data=form_data, headers=headers)
         bso = BeautifulSoup(r.text, "html5lib")
         tabela_extrato = bso.find('table')
-        df = pd.read_html(str(tabela_extrato))
+        df = pd.read_html(str(tabela_extrato), thousands='.', decimal=',')
         df[0].to_excel(file_dst, index=False)
         print(f'{periodo.text} salvo em {file_dst}')
         

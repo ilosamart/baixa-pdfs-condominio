@@ -7,5 +7,6 @@ settings = Dynaconf(
         Validator('CPF', default=''),
         Validator('SENHA', default=''),
         Validator('NOME', default=''),
+        Validator('DEST_PATH', default='/tmp/'),
     ],
 )
