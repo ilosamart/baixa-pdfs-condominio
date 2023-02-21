@@ -39,16 +39,31 @@ def valor_presente():
                             month=data_analise.month, day=1)
         file_name = f'{settings.dest_path}/{data_analise.year}_{str(data_analise.month).rjust(2, "0")}.xlsx'
         try:
-            dados_mes = pd.read_excel(file_name, decimal=',', thousands='.')
+            dados_mes = pd.read_excel(file_name)
+            try:
+                condominio_301 = dados_mes[dados_mes['Descrição'].str.contains('CONDOMINIO') & dados_mes['Descrição'].str.contains('301')]['Crédito'].iloc[0]
+                if not isinstance(condominio_301, float):
+                    if ',' not in condominio_301 and '.' not in condominio_301:
+                        condominio_301 = int(condominio_301) / 100
+                    else:
+                        condominio_301 = float(condominio_301.replace('.', '').replace(',', '.'))
+            except:
+                condominio_301 = 0
+            
             try:
                 saldo = float(dados_mes.iloc[-1]['Saldo'])
             except ValueError:
-                saldo = float(dados_mes.iloc[-1]['Saldo'].replace(' ', '').replace('.', '').replace(',', '.'))
+                saldo_mes = dados_mes.iloc[-1]['Saldo'].replace(' ', '')
+                if ',' in saldo_mes:
+                    saldo = float(saldo_mes.replace('.', '').replace(',', '.'))
             try:
-                valor_presente = saldo * ipca_acumulado[f'{str(data_analise.month).rjust(2, "0")}/{data_analise.year}']
+                ipca_acumulado_periodo = ipca_acumulado[f'{str(data_analise.month).rjust(2, "0")}/{data_analise.year}']
             except KeyError:
-                valor_presente = saldo
-            print(f'{data_analise},{saldo},{valor_presente}')
+                ipca_acumulado_periodo = 1
+            
+            valor_presente = saldo * ipca_acumulado_periodo
+            condominio_301_presente = condominio_301 * ipca_acumulado_periodo
+            print(f'{data_analise},{saldo},{valor_presente},{condominio_301},{condominio_301_presente}')
         except FileNotFoundError:
             print('Arquivo não encontrado', file_name, file=sys.stderr)
         data_analise += timedelta(days=32)
