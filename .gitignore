@@ -1,6 +1,7 @@
-venv
+.venv
 **/*.pyc
 __pycache__
 secrets
 downloads
 .secrets*
+node_modules

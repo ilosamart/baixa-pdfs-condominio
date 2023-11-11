@@ -1,6 +1,0 @@
-pandas==1.4.2
-lxml==4.9.2
-httpx
-dynaconf
-beautifulsoup4
-html5lib
